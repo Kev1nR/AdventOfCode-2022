@@ -1,18 +1,38 @@
 #load @"..\Read-data.fsx"
 
-let filePath = @"Day 2\input-data-example.txt"
+let filePath = @"Day 2\input-data.txt"
 
-let (|Rock|Paper|Scissors|) input =
-    if input = "A" then Rock
-    elif input = "B" then Paper
-    elif input = "C" then Scissors
-    else failwith "Invalid input"
+let evalLosingHand hand =
+    let handVal =
+        if hand = "A" then 0
+        elif hand = "B" then 1
+        else 2
+    ((handVal + 2) % 3) + 1
 
+let evalDrawingHand hand =
+    let handVal =
+        if hand = "A" then 0
+        elif hand = "B" then 1
+        else 2
+    handVal + 1
+
+let evalWinningHand hand =
+    let handVal =
+        if hand = "A" then 0
+        elif hand = "B" then 1
+        else 2
+    ((handVal + 1) % 3) + 1
+
+let evalTurn (input : string) =
+    let hand, result = input.Split(' ') |> fun t -> t[0], t[1]
+
+    match result with
+    | "X" -> 0 + evalLosingHand hand
+    | "Y" -> 3 + evalDrawingHand hand
+    | "Z" -> 6 + evalWinningHand hand
+    | _ -> failwith "Invalid turn: %s" input
 
 
 (ReadData.readLines filePath)
-|> Seq.map (fun (turn: string) ->
-             match turn.Split(' ')[0] with
-             | Rock -> 1
-             | Paper -> 2
-             | Scissors -> 3)
+|> Seq.map (evalTurn)
+|> Seq.sum
