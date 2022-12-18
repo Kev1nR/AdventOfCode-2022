@@ -18,14 +18,18 @@ let stacks = (ReadData.readLines filePath)
                           |> Seq.filter (fun s -> s.Contains('['))
                           |> Seq.map (fun s -> s.Replace("   ", "[]").Replace("[","").Replace("]",""))
                           |> Seq.map (fun s -> s.Split(' ') |> Array.toList)
-                        //   |> Seq.rev
                           |> Seq.map (fun c -> c |> Seq.map (fun c' -> [c']))
                           |> Seq.map (fun s -> s |> Seq.toArray)
                           |> Seq.toArray
 
-// let stackCount = stacks |> Seq.last |> fun s -> s.Split('[') |> Seq.length - 1
+let instructions =
+    (ReadData.readLines filePath)
+    |> Seq.filter (fun s -> s.StartsWith("move"))
+    |> Seq.map (fun s ->
+                    let parsed = s.Split(' ')
+                    parsed[1], parsed[3], parsed[5])
 
-let instructions = (ReadData.readLines filePath) |> Seq.filter (fun s -> s.StartsWith("move"))
-
-// stacks |> Seq.rev
-//        |> Seq.fold (fun acc stack -> )
+let restack stacks instruction =
+    let cnt, src, dst = instruction
+    for c in 0 .. cnt -1 do
+        let crate = stacks[src-1] |> Seq.head
